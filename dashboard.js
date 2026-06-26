@@ -1,28 +1,9 @@
-(async function() {
-    // ১. আপনার ফায়ারবেস কনফিগুরেশন ও ডাটাবেজ লিংক
-    const firebaseProjectId = "tamin-mini-bot";
-    const dbUrl = `https://${firebaseProjectId}-default-rtdb.firebaseio.com/password.json`;
+(function() {
+    // আগের কোডটি ব্রাউজারে থাকলে তা রিমুভ করার জন্য
+    var oldPanel = document.getElementById("tamin-admin-panel");
+    if (oldPanel) oldPanel.remove();
 
-    // ইউজারের কাছ থেকে পাসওয়ার্ড চাওয়া
-    var userPass = prompt("Tamim Mini Bot - এডমিন প্যানেল পাসওয়ার্ড দিন:");
-    if (!userPass) return;
-
-    try {
-        // ফায়ারবেস রিয়াল-টাইম ডাটাবেজ থেকে পাসওয়ার্ড চেক করা
-        let response = await fetch(dbUrl);
-        let correctPass = await response.json();
-
-        // যদি ডাটাবেজে পাসওয়ার্ড খালি থাকে বা না মিলে
-        if (!correctPass || userPass !== correctPass.toString().trim()) {
-            alert("ভুল পাসওয়ার্ড! অ্যাক্সেস রিফিউজড।");
-            return;
-        }
-    } catch (error) {
-        alert("সার্ভার কানেকশন ফেইল্ড! ফায়ারবেস ডাটাবেজ রুলস (Rules) চেক করুন।");
-        return;
-    }
-
-    // ২. ড্যাশবোর্ডের UI (ইউজার ইন্টারফেস) তৈরি
+    // ১. ড্যাশবোর্ডের UI (ইউজার ইন্টারফেস) তৈরি
     var panel = document.createElement('div');
     panel.id = "tamin-admin-panel";
     panel.style.position = 'fixed';
@@ -46,14 +27,15 @@
             <button id="close-db-panel" style="background:none; border:none; color:#EF4444; cursor:pointer; font-weight:bold; font-size:18px;">✕</button>
         </div>
         <div style="display:flex; flex-direction:column; gap:10px;" id="dashboard-features">
-            </div>
+            <!-- বাটনগুলো নিচে ডায়নামিকালি এড হবে -->
+        </div>
     `;
     document.body.appendChild(panel);
 
     // ক্লোজ বাটন ফাংশন
     document.getElementById('close-db-panel').onclick = function() { panel.remove(); };
 
-    // ৩. ফিচার বাটন এড করার ডাইনামিক ফাংশন
+    // ২. ফিচার বাটন এড করার ডাইনামিক ফাংশন
     function addFeature(name, description, color, callback) {
         var btn = document.createElement('button');
         btn.style.width = '100%';
@@ -75,7 +57,7 @@
         document.getElementById('dashboard-features').appendChild(btn);
     }
 
-    // ================= এখানে আপনার ফিচারসমূহ সাজানো আছে =================
+    // ================= ফিচারসমূহ =================
 
     // ফিচার ১: Eruda Console
     addFeature("🛠️ Open Eruda Console", "মোবাইল ডেভেলপার কনসোল ও লগ দেখার জন্য", "#10B981", function() {
@@ -87,10 +69,8 @@
 
     // ফিচার ২: Element Inspector (Chii)
     addFeature("🔍 Inspect Element", "লাইভ ওয়েবসাইটের যেকোনো কোড এডিট/inspect করার জন্য", "#3B82F6", function() {
-        if (window.chii) { alert("Chii already loaded"); } else {
-            var s = document.createElement('script'); s.src = "//cdn.jsdelivr.net/npm/chii";
-            document.body.appendChild(s);
-        }
+        var s = document.createElement('script'); s.src = "//cdn.jsdelivr.net/npm/chii";
+        document.body.appendChild(s);
     });
 
     // ফিচার ৩: পাসওয়ার্ড ভিউয়ার
@@ -106,16 +86,9 @@
         alert(count > 0 ? `${count}টি পাসওয়ার্ড ফিল্ড আনহাইড করা হয়েছে!` : "কোনো পাসওয়ার্ড ফিল্ড পাওয়া যায়নি।");
     });
 
-    // ফিচার ৪: নাইট মোড টগল
+    //  ফিচার ৪: নাইট মোড টগল
     addFeature("🎨 Toggle Night Mode", "যেকোনো ওয়েবসাইটকে ডার্ক মোড করার জন্য", "#8B5CF6", function() {
         document.body.style.filter = document.body.style.filter ? '' : 'invert(1) hue-rotate(180deg)';
     });
-
-    // ভবিষ্যৎ ফিচার যুক্ত করার ফরম্যাট (নমুনা):
-    /*
-    addFeature("ফিচারের নাম", "ফিচারের বর্ণনা", "#রঙের_কোড", function() {
-        // কোড এখানে বসবে
-    });
-    */
 
 })();
