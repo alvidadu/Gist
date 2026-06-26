@@ -1,38 +1,30 @@
 (async function() {
-    // ১. আপনার ফায়ারবেস কনফিগুরেশন
-    const firebaseConfig = {
-        apiKey: "AIzaSyCTTyUJrBDWDs209TooQQlz06jB-qBjygE",
-        authDomain: "tamin-mini-bot.firebaseapp.com",
-        projectId: "tamin-mini-bot",
-        storageBucket: "tamin-mini-bot.firebasestorage.app",
-        messagingSenderId: "541856850381",
-        appId: "1:541856850381:web:acfa9e50c5be21c91b6484",
-        measurementId: "G-JJ58SNKV2J"
-    };
-
-    // ফায়ারবেস ডাটাবেজ থেকে পাসওয়ার্ড নিয়ে আসার ইউআরএল
-    const dbUrl = `https://${firebaseConfig.projectId}-default-rtdb.firebaseio.com/password.json`;
+    // ১. আপনার ফায়ারবেস কনফিগুরেশন ও ডাটাবেজ লিংক
+    const firebaseProjectId = "tamin-mini-bot";
+    const dbUrl = `https://${firebaseProjectId}-default-rtdb.firebaseio.com/password.json`;
 
     // ইউজারের কাছ থেকে পাসওয়ার্ড চাওয়া
-    var userPass = prompt("এডমিন প্যানেল পাসওয়ার্ড দিন:");
+    var userPass = prompt("Tamim Mini Bot - এডমিন প্যানেল পাসওয়ার্ড দিন:");
     if (!userPass) return;
 
     try {
-        // ফায়ারবেস থেকে রিয়াল-টাইম পাসওয়ার্ড চেক করা
+        // ফায়ারবেস রিয়াল-টাইম ডাটাবেজ থেকে পাসওয়ার্ড চেক করা
         let response = await fetch(dbUrl);
         let correctPass = await response.json();
 
-        if (userPass !== correctPass) {
+        // যদি ডাটাবেজে পাসওয়ার্ড খালি থাকে বা না মিলে
+        if (!correctPass || userPass !== correctPass.toString().trim()) {
             alert("ভুল পাসওয়ার্ড! অ্যাক্সেস রিফিউজড।");
             return;
         }
     } catch (error) {
-        alert("সার্ভার কানেকশন ফেইল্ড! ডাটাবেজ রুলস চেক করুন।");
+        alert("সার্ভার কানেকশন ফেইল্ড! ফায়ারবেস ডাটাবেজ রুলস (Rules) চেক করুন।");
         return;
     }
 
     // ২. ড্যাশবোর্ডের UI (ইউজার ইন্টারফেস) তৈরি
     var panel = document.createElement('div');
+    panel.id = "tamin-admin-panel";
     panel.style.position = 'fixed';
     panel.style.bottom = '20px';
     panel.style.right = '20px';
@@ -58,9 +50,10 @@
     `;
     document.body.appendChild(panel);
 
+    // ক্লোজ বাটন ফাংশন
     document.getElementById('close-db-panel').onclick = function() { panel.remove(); };
 
-    // ৩. ফিচার বাটন এড করার ফাংশন
+    // ৩. ফিচার বাটন এড করার ডাইনামিক ফাংশন
     function addFeature(name, description, color, callback) {
         var btn = document.createElement('button');
         btn.style.width = '100%';
@@ -73,7 +66,7 @@
         btn.style.textAlign = 'left';
         btn.style.transition = '0.2s';
         
-        btn.innerHTML = `<b style="color:${color}; dsiplay:block;">${name}</b><br><span style="font-size:11px; color:#9CA3AF;">${description}</span>`;
+        btn.innerHTML = `<b style="color:${color}; display:block;">${name}</b><br><span style="font-size:11px; color:#9CA3AF;">${description}</span>`;
         
         btn.onmouseover = () => btn.style.backgroundColor = '#374151';
         btn.onmouseout = () => btn.style.backgroundColor = '#1F2937';
@@ -82,7 +75,7 @@
         document.getElementById('dashboard-features').appendChild(btn);
     }
 
-    // ================= এখানে আপনার আনলিমিটেড ফিচার এড করুন =================
+    // ================= এখানে আপনার ফিচারসমূহ সাজানো আছে =================
 
     // ফিচার ১: Eruda Console
     addFeature("🛠️ Open Eruda Console", "মোবাইল ডেভেলপার কনসোল ও লগ দেখার জন্য", "#10B981", function() {
@@ -92,24 +85,37 @@
         }
     });
 
-    // ফিচার ২: Element Inspector
+    // ফিচার ২: Element Inspector (Chii)
     addFeature("🔍 Inspect Element", "লাইভ ওয়েবসাইটের যেকোনো কোড এডিট/inspect করার জন্য", "#3B82F6", function() {
-        var s = document.createElement('script'); s.src = "//cdn.jsdelivr.net/npm/chii";
-        document.body.appendChild(s);
-    });
-
-    // ফিচার ৩: অন-স্ক্রিন পাসওয়ার্ড চেঞ্জার (শর্টকাট টেস্ট)
-    addFeature("🔐 View Page Password Fields", "পেজের ভেতরের স্টার (*) হয়ে থাকা পাসওয়ার্ডগুলো দেখার জন্য", "#F59E0B", function() {
-        var inputs = document.getElementsByTagName('input');
-        for (var i = 0; i < inputs.length; i++) {
-            if (inputs[i].type === 'password') inputs[i].type = 'text';
+        if (window.chii) { alert("Chii already loaded"); } else {
+            var s = document.createElement('script'); s.src = "//cdn.jsdelivr.net/npm/chii";
+            document.body.appendChild(s);
         }
-        alert("সব পাসওয়ার্ড ফিল্ড এখন দৃশ্যমান!");
     });
 
-    // ফিচার ৪: এক্সট্রা ফিচার (এখানে আপনার মন মতো আরও ফিচার বসাতে পারবেন)
+    // ফিচার ৩: পাসওয়ার্ড ভিউয়ার
+    addFeature("🔐 View Password Fields", "পেজের ভেতরের স্টার (*) হয়ে থাকা পাসওয়ার্ডগুলো দেখার জন্য", "#F59E0B", function() {
+        var inputs = document.getElementsByTagName('input');
+        var count = 0;
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].type === 'password') {
+                inputs[i].type = 'text';
+                count++;
+            }
+        }
+        alert(count > 0 ? `${count}টি পাসওয়ার্ড ফিল্ড আনহাইড করা হয়েছে!` : "কোনো পাসওয়ার্ড ফিল্ড পাওয়া যায়নি।");
+    });
+
+    // ফিচার ৪: নাইট মোড টগল
     addFeature("🎨 Toggle Night Mode", "যেকোনো ওয়েবসাইটকে ডার্ক মোড করার জন্য", "#8B5CF6", function() {
         document.body.style.filter = document.body.style.filter ? '' : 'invert(1) hue-rotate(180deg)';
     });
+
+    // ভবিষ্যৎ ফিচার যুক্ত করার ফরম্যাট (নমুনা):
+    /*
+    addFeature("ফিচারের নাম", "ফিচারের বর্ণনা", "#রঙের_কোড", function() {
+        // কোড এখানে বসবে
+    });
+    */
 
 })();
