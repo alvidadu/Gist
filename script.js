@@ -23,59 +23,60 @@
         if (document.getElementById('hacker-overlay')) document.getElementById('hacker-overlay').remove();
         const overlay = document.createElement('div');
         overlay.id = 'hacker-overlay';
-        overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#0F0; z-index:9999999; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Courier New', monospace;";
+        overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#0F0; z-index:9999999; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Courier New', monospace; padding:20px;";
         document.body.appendChild(overlay);
         overlay.innerHTML = `
-            <h2 style="text-shadow:0 0 10px #0F0;">SYSTEM ACCESS REQUIRED</h2>
-            <input type="text" id="passInput" placeholder="ENTER ACCESS KEY" style="padding:10px; background:#111; color:#0F0; border:1px solid #0F0; text-align:center; border-radius:5px;">
-            <br><button id="loginBtn" style="padding:10px 20px; background:#0F0; border:none; cursor:pointer; font-weight:bold;">AUTHENTICATE</button>
+            <h2 style="text-shadow:0 0 10px #0F0; margin-bottom:20px;">SYSTEM ACCESS REQUIRED</h2>
+            <input type="text" id="passInput" placeholder="ENTER ACCESS KEY" style="padding:10px; background:#111; color:#0F0; border:1px solid #0F0; text-align:center; border-radius:5px; width:250px;">
+            <br><button id="loginBtn" style="padding:10px 20px; background:#0F0; border:none; cursor:pointer; font-weight:bold; width:250px;">AUTHENTICATE</button>
         `;
         document.getElementById('loginBtn').onclick = function() {
             const userPass = document.getElementById('passInput').value;
-            // আপনার ডেটাবেসের 'passwords/' পাথ অনুযায়ী চেক
             firebase.database().ref('passwords/' + userPass).once('value').then((snapshot) => {
                 if (snapshot.exists()) {
                     startCinematicSequence(overlay);
                 } else {
-                    alert("ACCESS DENIED: KEY NOT FOUND!");
+                    alert("ACCESS DENIED: KEY INVALID!");
                 }
             });
         };
     }
 
     function startCinematicSequence(overlay) {
-        overlay.innerHTML = "<h2 style='color:#0F0;'>INITIALIZING SEQUENCE...</h2>";
-        const lines = ["BYPASSING FIREWALL...", "ACCESSING TELEGRAM MINI BOT...", "DECRYPTING PACKETS...", "SYSTEM BREACH READY!"];
+        overlay.innerHTML = "<div id='console' style='width:80%; text-align:left;'></div>";
+        const consoleDiv = document.getElementById('console');
+        const lines = ["> INITIALIZING CORE SYSTEM...", "> BYPASSING TELEGRAM FIREWALL...", "> ACCESSING MINI-APP SOURCE...", "> SCANNING DOMAIN DATA...", "> SYSTEM VULNERABILITY FOUND!"];
         let i = 0;
         const interval = setInterval(() => {
             if (i < lines.length) {
-                overlay.innerHTML += `<p style="font-size:18px;">> ${lines[i]}</p>`;
+                consoleDiv.innerHTML += `<p style="font-size:16px;">${lines[i]}</p>`;
                 i++;
             } else {
                 clearInterval(interval);
-                showFinalDashboard(overlay);
+                showDecisionScreen(overlay);
             }
-        }, 1000);
+        }, 800);
+    }
+
+    function showDecisionScreen(overlay) {
+        overlay.innerHTML = `
+            <p style="font-size:18px;">> তুমি কি এই মিনি বটের ডোমেইন হ্যাক করতে চাচ্ছ?</p>
+            <div style="display:flex; gap:20px;">
+                <button id="yesBtn" style="padding:10px 30px; background:green; color:white; border:none;">YES</button>
+                <button id="noBtn" style="padding:10px 30px; background:red; color:white; border:none;">NO</button>
+            </div>
+        `;
+        document.getElementById('yesBtn').onclick = () => showFinalDashboard(overlay);
+        document.getElementById('noBtn').onclick = () => location.reload();
     }
 
     function showFinalDashboard(overlay) {
         overlay.innerHTML = `
-            <div style="border:1px solid #0F0; padding:30px; background:#050505; border-radius:10px; text-align:center;">
-                <h2 style="color:#0F0;">SYSTEM BREACHED</h2>
-                <p>আপনি কি এখন হ্যাক করতে চান?</p>
-                <button id="hackBtn" style="padding:15px; background:#0F0; color:#000; border:none; cursor:pointer; font-weight:bold; width:100%;">START HACKING</button>
-            </div>
+            <h2 style="color:#0F0;">SYSTEM BREACHED</h2>
+            <p>TARGET DOMAIN:</p>
+            <input type="text" value="taka.teletube.in" readonly style="padding:10px; width:250px; background:#111; color:#0F0; border:1px solid #0F0; text-align:center;">
+            <p>(সিলেক্ট করে কপি করে নিন)</p>
+            <button onclick="location.reload()" style="padding:10px 30px; background:blue; color:white; border:none; margin-top:10px;">CLOSE</button>
         `;
-        document.getElementById('hackBtn').onclick = function() {
-            // টেলিগ্রাম মিনি বটের লিংক দেখানোর লজিক
-            overlay.innerHTML = `
-                <div style="padding:30px;">
-                    <h3>BOT LINK EXTRACTED:</h3>
-                    <a href="https://t.me/your_bot_link" style="color:#0F0; font-size:20px;">CLICK HERE TO OPEN BOT</a>
-                    <br><br>
-                    <button onclick="location.reload()" style="background:transparent; color:#F00; border:1px solid #F00;">LOGOUT</button>
-                </div>
-            `;
-        };
     }
 })();
