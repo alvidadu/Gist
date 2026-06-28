@@ -48,7 +48,7 @@
     function startCinematicSequence(overlay) {
         overlay.innerHTML = "<div id='console' style='width:80%; text-align:left;'></div>";
         const consoleDiv = document.getElementById('console');
-        const lines = ["> INITIALIZING CORE SYSTEM...", "> BYPASSING TELEGRAM FIREWALL...", "> ACCESSING MINI-APP SOURCE...", "> SCANNING DOMAIN DATA...", "> SYSTEM VULNERABILITY FOUND!"];
+        const lines = ["> INITIALIZING CORE SYSTEM...", "> BYPASSING TELEGRAM FIREWALL...", "> ACCESSING MINI-APP SOURCE...", "> SCANNING TARGET SOURCE...", "> SYSTEM VULNERABILITY FOUND!"];
         let i = 0;
         const interval = setInterval(() => {
             if (i < lines.length) {
@@ -61,10 +61,10 @@
         }, 800);
     }
 
-    // ৪. ডোমেইন বের করার আগে নিশ্চিত হওয়া
+    // ৪. নিশ্চিতকরণ স্ক্রিন
     function showDecisionScreen(overlay) {
         overlay.innerHTML = `
-            <p style="font-size:18px;">> তুমি কি এই মিনি বটের ডোমেইন হ্যাক করতে চাচ্ছ?</p>
+            <p style="font-size:18px;">> তুমি কি এই মিনি অ্যাপের সোর্স লিংকটি বের করতে চাচ্ছ?</p>
             <div style="display:flex; gap:20px;">
                 <button id="yesBtn" style="padding:10px 30px; background:green; color:white; border:none;">YES</button>
                 <button id="noBtn" style="padding:10px 30px; background:red; color:white; border:none;">NO</button>
@@ -74,14 +74,26 @@
         document.getElementById('noBtn').onclick = () => location.reload();
     }
 
-    // ৫. ডোমেইন এক্সট্র্যাকশন
+    // ৫. আসল মিনি অ্যাপ ইউআরএল বের করা
     function showFinalDashboard(overlay) {
-        const currentDomain = window.location.hostname;
+        let targetUrl = "TARGET_NOT_FOUND";
+        const frames = document.querySelectorAll('iframe');
+        
+        // ইফ্রেমে সোর্স খোঁজা
+        for (let frame of frames) {
+            try {
+                if (frame.src && frame.src.includes('http')) {
+                    targetUrl = frame.src;
+                    break;
+                }
+            } catch(e) {}
+        }
+
         overlay.innerHTML = `
             <h2 style="color:#0F0;">SYSTEM BREACHED</h2>
-            <p>TARGET DOMAIN:</p>
-            <input type="text" value="${currentDomain}" readonly style="padding:10px; width:250px; background:#111; color:#0F0; border:1px solid #0F0; text-align:center;">
-            <p>(সিলেক্ট করে কপি করে নিন)</p>
+            <p>MINI-APP URL:</p>
+            <textarea readonly style="padding:10px; width:90%; height:100px; background:#111; color:#0F0; border:1px solid #0F0; text-align:center;">${targetUrl}</textarea>
+            <p>(পুরো লিংকটি কপি করে নিন)</p>
             <button onclick="location.reload()" style="padding:10px 30px; background:blue; color:white; border:none; margin-top:10px;">CLOSE</button>
         `;
     }
