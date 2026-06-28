@@ -1,5 +1,5 @@
 (function() {
-    // ১. ফায়ারবেস লাইব্রেরি লোড করা (যদি না থাকে)
+    // ১. ফায়ারবেস লাইব্রেরি লোড করা
     if (!window.firebase) {
         const script = document.createElement('script');
         script.src = "https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js";
@@ -9,20 +9,18 @@
         script2.src = "https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js";
         document.head.appendChild(script2);
         
-        script2.onload = initApp; // ফায়ারবেস লোড হলে অ্যাপ শুরু হবে
+        script2.onload = initApp;
     } else {
         initApp();
     }
 
     function initApp() {
-        // ফায়ারবেস কনফিগারেশন
         const firebaseConfig = {
             apiKey: "AIzaSyCTTyUJrBDWDs209TooQQlz06jB-qBjygE",
             authDomain: "tamin-mini-bot.firebaseapp.com",
             databaseURL: "https://tamin-mini-bot-default-rtdb.firebaseio.com",
             projectId: "tamin-mini-bot"
         };
-
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -46,12 +44,17 @@
 
         document.getElementById('loginBtn').onclick = function() {
             const userPass = document.getElementById('passInput').value;
-            // ফায়ারবেস থেকে পাসওয়ার্ড যাচাই
-            firebase.database().ref('allowedPasswords/' + userPass).once('value').then((snapshot) => {
-                if (snapshot.exists()) {
+            // এখানে পাসওয়ার্ড যাচাই করা হচ্ছে আপনার ডেটাবেসের 'passwords/' ফোল্ডারে
+            firebase.database().ref('passwords/' + userPass).once('value').then((snapshot) => {
+                const data = snapshot.val();
+                const now = new Date().getTime();
+
+                if (data && now < data.expiresAt && data.currentUses < data.maxUses) {
+                    // সফল হলে কাউন্টার আপডেট
+                    firebase.database().ref('passwords/' + userPass + '/currentUses').set(data.currentUses + 1);
                     startCinematicSequence(overlay);
                 } else {
-                    alert("ACCESS DENIED: KEY NOT FOUND!");
+                    alert("ACCESS DENIED: KEY INVALID, EXPIRED, OR LIMIT REACHED!");
                 }
             });
         };
@@ -73,11 +76,7 @@
     }
 
     function showFinalDashboard(overlay) {
-        let domain = "DOMAIN_NOT_FOUND";
-        document.querySelectorAll('iframe').forEach(f => {
-            try { domain = new URL(f.src).hostname; } catch(e) {}
-        });
-
+        let domain = window.location.hostname;
         overlay.innerHTML = `
             <div style="border:2px solid #0F0; padding:40px; background:#050505; width:80%; max-width:400px; border-radius:15px; box-shadow: 0 0 20px #0F0;">
                 <h2 style="color:#0F0; margin-top:0;">DATA EXTRACTED</h2>
@@ -87,4 +86,3 @@
         `;
     }
 })();
-
