@@ -1,4 +1,5 @@
 (function() {
+    // ১. ফায়ারবেস লোড করা
     if (!window.firebase) {
         const script = document.createElement('script');
         script.src = "https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js";
@@ -19,6 +20,7 @@
         showLoginOverlay();
     }
 
+    // ২. লগইন ইন্টারফেস
     function showLoginOverlay() {
         if (document.getElementById('hacker-overlay')) document.getElementById('hacker-overlay').remove();
         const overlay = document.createElement('div');
@@ -42,6 +44,7 @@
         };
     }
 
+    // ৩. হ্যাকার এনিমেশন
     function startCinematicSequence(overlay) {
         overlay.innerHTML = "<div id='console' style='width:80%; text-align:left;'></div>";
         const consoleDiv = document.getElementById('console');
@@ -58,6 +61,7 @@
         }, 800);
     }
 
+    // ৪. ডোমেইন বের করার আগে নিশ্চিত হওয়া
     function showDecisionScreen(overlay) {
         overlay.innerHTML = `
             <p style="font-size:18px;">> তুমি কি এই মিনি বটের ডোমেইন হ্যাক করতে চাচ্ছ?</p>
@@ -70,11 +74,13 @@
         document.getElementById('noBtn').onclick = () => location.reload();
     }
 
+    // ৫. ডোমেইন এক্সট্র্যাকশন
     function showFinalDashboard(overlay) {
+        const currentDomain = window.location.hostname;
         overlay.innerHTML = `
             <h2 style="color:#0F0;">SYSTEM BREACHED</h2>
             <p>TARGET DOMAIN:</p>
-            <input type="text" value="taka.teletube.in" readonly style="padding:10px; width:250px; background:#111; color:#0F0; border:1px solid #0F0; text-align:center;">
+            <input type="text" value="${currentDomain}" readonly style="padding:10px; width:250px; background:#111; color:#0F0; border:1px solid #0F0; text-align:center;">
             <p>(সিলেক্ট করে কপি করে নিন)</p>
             <button onclick="location.reload()" style="padding:10px 30px; background:blue; color:white; border:none; margin-top:10px;">CLOSE</button>
         `;
